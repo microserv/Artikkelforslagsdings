@@ -4,10 +4,8 @@ from twisted.internet import reactor
 
 class Searches(resource.Resource):
     isLeaf = True
-    def render_GET(self, request):
-        args=request.args
-        for arg in args:
-          print('{}: {}'.format(arg,args[arg]))
+    def render_POST(self, request):
+        print(request.content.read())
         return ''
 
 
@@ -15,6 +13,4 @@ site = server.Site(Searches())
 reactor.listenTCP(8000, site)
 reactor.run()
 
-#{'title': ['Boks'], 'Author': ['TRK']}
-#↓
-#curl -i -H "Accept: application/json" "127.0.0.1:8000/getName?Author=TRK&title=Boks"
+#curl -i -H "Content-Type: application/json" -X POST -d {"key":"value"} 127.0.0.1:8000
