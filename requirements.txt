@@ -1,0 +1,2 @@
+twisted-web>=12.3.0
+twisted-core>=12.3.0
