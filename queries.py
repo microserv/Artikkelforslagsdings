@@ -3,6 +3,8 @@ from ast import literal_eval
 import json
 import re
 
+import norvig_spellcheck
+
 class Query(object):
     def __init__(self, d):
         self.d = d
@@ -26,22 +28,28 @@ class Query(object):
 def process_partial(s):
     s2 = s
     s2 = re.sub('\s+', ' ', s2).lstrip()
-    parts = s2.split()
+    
+    parts = s2.split(' ')
     complete = ' '.join(parts[:-1])
+    complete = process_query(complete)
+    
     partial = parts[-1]
  
-    complete = process_query(complete)
     s2 = ' '.join([complete, partial])
 #Process the (complete) querystring with normalization/stemming and various enhancements 
 def process_query(s):
     s2 = s
     s2 = re.sub('\s+', ' ', s2).lstrip()
+    s2 = norvig_spellcheck
     s2 = _normalize_query(s2)
     s2 = _enhance_query(s2)
     return s2
 
 #Stemming
 def _normalize_query(s):
+    stemmer = nltk.stem.snowball.NorwegianStemmer(ignore_stopwords=False)
+    words = [stemmer.stem(word) for word in s.split()]
+    print(words)
     return s
 
 #Hva?

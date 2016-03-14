@@ -1,4 +1,5 @@
 #-*- coding:utf8 -*-
+from __builtins__ impor
 from twisted.web import server, resource
 from twisted.internet import reactor
 import json
@@ -18,7 +19,6 @@ class Searches(resource.Resource):
         #process client result
         #...
         return ''
-
 site = server.Site(Searches())
 reactor.listenTCP(8000, site)
 reactor.run()
@@ -62,7 +62,7 @@ reactor.run()
 #
 #Komplett query
 #   søk --> indeks
-#   '{"Partial":false, "Query":"Forskrifter"}' 127.0.0.1:8000
+#   '{"Partial":false, "Query":"Forskrift"}'
 #forventer svar:
 #   Liste over resultater.
 #   Format på returliste er ganske fritt, men resultatlisten *må* inneholde URI til artikkelene eller dokumentene der hvert resultat kan finnes
