@@ -1,5 +1,5 @@
 #-*- coding:utf8 -*-
-from __builtins__ impor
+#from __builtins__ impor
 from twisted.web import server, resource
 from twisted.internet import reactor
 import json
@@ -14,7 +14,7 @@ class Searches(resource.Resource):
         d = json.load(request.content)
         query = queries.Query(d)
         qs = json.dumps(query.prepare())
-        result = client.post(qs)
+        result = client.send_query(qs)
 
         #process client result
         #...

@@ -40,17 +40,17 @@ def process_partial(s):
 def process_query(s):
     s2 = s
     s2 = re.sub('\s+', ' ', s2).lstrip()
-    s2 = norvig_spellcheck
+    #s2 = norvig_spellcheck
     s2 = _normalize_query(s2)
     s2 = _enhance_query(s2)
     return s2
 
 #Stemming
 def _normalize_query(s):
+    print(s)
     stemmer = nltk.stem.snowball.NorwegianStemmer(ignore_stopwords=False)
     words = [stemmer.stem(word) for word in s.split()]
-    print(words)
-    return s
+    return ' '.join(words)
 
 #Hva?
 def _enhance_query(s):

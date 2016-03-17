@@ -1,12 +1,30 @@
 from twisted.internet import reactor, protocol
+import json
 
 class IndexQuery(protocol.Protocol):
     def connectionMade(self):
-        
+        self.transport.write(self.POST)
 
-class IndexQueryFactoy(protocol.ClientFactory):
+class IndexQueryFactory(protocol.ClientFactory):
     def __init__(self, query):
-        pass
+        self.query = query
+        self.POST = self.construct_jsonpost(query)
+
+    def construct_jsonpost(self, d):
+        src = '''POST /request HTTP/1.1
+                 Accept: application/jsonrequest
+                 Content-Length: {}
+                 Content-Type: application/jsonrequest
+                 
+                 {}
+              '''
+        src = '\n'.join(x.strip() for x in src.split('\n'))
+        
+        dump = json.dumps(d)
+        
+        src = src.format(len(dump), dump)
+        print(src)
+        return src
 
     def clientConnectionFailed(self, connector, reason):
         print("Connection failed")
@@ -16,7 +34,7 @@ class IndexQueryFactoy(protocol.ClientFactory):
         print("Connection lost")
         
 def send_query(query):
-    f = IndexQueryFactory(query)
-    reactor.connectTCP("localhost", 8000, f)
-    reactor.run()
+    fact = IndexQueryFactory(query)
+    print("boop")
+    reactor.connectTCP("127.0.0.1", 8001, fact)
 
