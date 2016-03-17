@@ -1,7 +1,6 @@
 #-*- coding:utf8 -*-
 #from __builtins__ impor
 from twisted.web import server, resource
-from twisted.internet import reactor
 import json
 
 import queries
@@ -14,14 +13,11 @@ class Searches(resource.Resource):
         d = json.load(request.content)
         query = queries.Query(d)
         qs = json.dumps(query.prepare())
-        result = client.send_query(qs)
+        result = client.send_query(reactor, qs)
 
         #process client result
         #...
         return ''
-site = server.Site(Searches())
-reactor.listenTCP(8000, site)
-reactor.run()
 
 
 #INPUT FRA SØKEFRONTEND/BRUKER:

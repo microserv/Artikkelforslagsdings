@@ -1,4 +1,4 @@
-from twisted.internet import reactor, protocol
+from twisted.internet import protocol
 import json
 
 class IndexQuery(protocol.Protocol):
@@ -33,8 +33,7 @@ class IndexQueryFactory(protocol.ClientFactory):
     def clientConnectionLost(self, connector, reason):
         print("Connection lost")
         
-def send_query(query):
+def send_query(reactor, query):
     fact = IndexQueryFactory(query)
-    print("boop")
     reactor.connectTCP("127.0.0.1", 8001, fact)
 
