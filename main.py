@@ -5,17 +5,16 @@ from twisted.web.http_headers import Headers
 from twisted.internet import reactor, defer
 from twisted.python import log
 from twisted.internet.task import deferLater
-from twisted.web.server import NOT_DONE_YET
 from twisted.internet.protocol import Factory, Protocol
 from twisted.internet.endpoints import TCP4ClientEndpoint
+
 import json
 
-
 import queries
+
 class SearchIndexClient(Protocol):
     def connectionMade(self):
-        request = self.factory.requestquery
-        self.transport.write(request)
+        self.transport.write(self.factory.requestquery)
         self.transport.loseConnection()
 
 #Convey searches to index and back
@@ -27,9 +26,6 @@ class SearchServer(resource.Resource):
         processed_query_dict = self.preprocess_query(request_dict)
 
         index_response = self.send_query_to_index(processed_query_dict)
-
-        r = self.send_query_to_index(processed_query_dict)
-
         #process client result
         #...
         return ''
@@ -57,25 +53,20 @@ POST / HTTP/1.1
 Host: 127.0.0.1:8001
 User-Agent: FUCKJAVA
 Content-Type: application/json
-Content-Length: %s
+Content-Length: {LEN}
 
-%s}""".strip().replace('\n', '\r\n') % (len(indexquery_string), indexquery_string)
+{JSON_STRING}""".strip().replace('\n', '\r\n').format(LEN=len(indexquery_string), JSON_STRING=indexquery_string)
 
         factory = Factory()
         factory.protocol = SearchIndexClient
         factory.requestquery = QUERY
         point = TCP4ClientEndpoint(reactor, "127.0.0.1", 8001)
         d = point.connect(factory)
-        def asdfg(x):
-            print(x)
-        d.addCallback(lambda x: asdfg(x))
 
-        #return NOT_DONE_YET
         return ""
 
 #agent = Agent(reactor)
-site=server.Site(SearchServer())               
-
+site=server.Site(SearchServer()) 
 reactor.listenTCP(8000,site)
 reactor.run()
 
