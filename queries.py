@@ -36,6 +36,7 @@ def process_partial(s):
     partial = parts[-1]
  
     s2 = ' '.join([complete, partial])
+    return s2
 #Process the (complete) querystring with normalization/stemming and various enhancements 
 def process_query(s):
     s2 = s

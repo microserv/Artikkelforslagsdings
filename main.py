@@ -7,59 +7,51 @@ from twisted.python import log
 from twisted.internet.task import deferLater
 from twisted.web.server import NOT_DONE_YET
 
-from server import Searches
 from client import IndexQueryFactory
 
 import json
 
 
 import queries
-import client
+#import client
 #Convey searches to index and back
 class SearchServer(resource.Resource):
     isLeaf = True
     def render_POST(self, request):
         request_dict = json.load(request.content)
-        #self.d_query = defer.Deferred()
-        #self.d_query.addCallbacks(self.send_query, log.err)
-        #reactor.callLater(0,self.preprocess_query, request_dict)
-        
-        q = self.preprocess_query(request_dict)
-        print("P")
-        r = self.send_query(q)
-        return NOT_DONE_YET
-        ##self.send_query(q)
-        
+
+        processed_query_dict = self.preprocess_query(request_dict)
+
+        index_response = self.send_query_to_index(processed_query_dict)
+
+        r = self.send_query_to_index(processed_query_dict)
+
         #process client result
         #...
-        ##return ''
+        return ''
     def preprocess_query(self, request_dict):
-        #if self.d_query is None:
-        #    print('No deferred')
-        #    return
-        #d_query = self.d_query
-        #self.d_query = None
         processed_query_dict = queries.Query(request_dict)
-        #d_query.callback(processed_query_dict)
-        #return
         return processed_query_dict
-    def send_query(self,query):
-        qs = json.dumps(query.prepare())
+
+    def send_query_to_index(self,query):
+        indexquery_string = json.dumps(query.prepare())
+        agent = Agent(reactor)
         d = agent.request(
             'POST',
             'http://127.0.0.1:8001',
-            Headers({'Accept':['application/jsonrequest'], 'Content-Type':['application/jsonrequest']}),
-            qs)
-        d.addCallback(self.delayed)
-        
-    def delayed(self, request):
-        print("Q")
-        print(request)
-def cbResponse(ignored):
-    print 'Response received'
-agent = Agent(reactor)
-    
+            Headers({'User-Agent': ['Twisted Search'],
+                     #'Accept':['application/json'], 
+                     'Content-Type':['application/json']
+                     }),
+            indexquery_string)
+        def asdfg(x):
+            print(x)
+        d.addCallback(lambda x: asdfg(x))
+        return NOT_DONE_YET
+
+#agent = Agent(reactor)
 site=server.Site(SearchServer())               
+
 reactor.listenTCP(8000,site)
 reactor.run()
 
