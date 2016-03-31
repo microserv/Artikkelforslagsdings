@@ -7,13 +7,12 @@ from twisted.python import log
 from twisted.internet.task import deferLater
 from twisted.web.server import NOT_DONE_YET
 
-from client import IndexQueryFactory
 
 import json
 
 
 import queries
-#import client
+
 #Convey searches to index and back
 class SearchServer(resource.Resource):
     isLeaf = True
@@ -29,6 +28,7 @@ class SearchServer(resource.Resource):
         #process client result
         #...
         return ''
+        
     def preprocess_query(self, request_dict):
         processed_query_dict = queries.Query(request_dict)
         return processed_query_dict
@@ -36,18 +36,22 @@ class SearchServer(resource.Resource):
     def send_query_to_index(self,query):
         indexquery_string = json.dumps(query.prepare())
         agent = Agent(reactor)
+        print(indexquery_string)
+        #{"Query": "forskrift om utdanning ", "Partial": true}
         d = agent.request(
             'POST',
             'http://127.0.0.1:8001',
             Headers({'User-Agent': ['Twisted Search'],
-                     #'Accept':['application/json'], 
+                     'Accept':['application/json'], 
                      'Content-Type':['application/json']
                      }),
             indexquery_string)
         def asdfg(x):
             print(x)
         d.addCallback(lambda x: asdfg(x))
-        return NOT_DONE_YET
+
+        #return NOT_DONE_YET
+        return ""
 
 #agent = Agent(reactor)
 site=server.Site(SearchServer())               
