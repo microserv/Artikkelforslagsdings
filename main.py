@@ -1,10 +1,8 @@
 #-*- coding:utf8 -*-
 from twisted.web import server, resource
-from twisted.web.client import Agent
 from twisted.web.http_headers import Headers
-from twisted.internet import reactor, defer
+from twisted.internet import reactor
 from twisted.python import log
-from twisted.internet.task import deferLater
 from twisted.internet.protocol import Factory, Protocol
 from twisted.internet.endpoints import TCP4ClientEndpoint
 
@@ -36,8 +34,6 @@ class SearchServer(resource.Resource):
 
     def send_query_to_index(self,query):
         indexquery_string = json.dumps(query.prepare())
-        agent = Agent(reactor)
-        print(indexquery_string)
         #{"Query": "forskrift om utdanning ", "Partial": true}
         #d = agent.request(
             #'POST',
@@ -65,7 +61,6 @@ Content-Length: {LEN}
 
         return ""
 
-#agent = Agent(reactor)
 site=server.Site(SearchServer()) 
 reactor.listenTCP(8000,site)
 reactor.run()

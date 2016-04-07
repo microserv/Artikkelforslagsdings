@@ -27,6 +27,7 @@ class Query(object):
 #and can be considered a complete query
 def process_partial(s):
     s2 = s
+    #remove additional whitespace, other than trailing ##Kanskje endre?
     s2 = re.sub('\s+', ' ', s2).lstrip()
     
     parts = s2.split(' ')
