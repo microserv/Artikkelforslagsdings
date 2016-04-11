@@ -86,7 +86,7 @@ TRUE = False
 class Spell_Query(object):
     def __init__(self, word):
         self.word = word
-        self.spell_host = config.spell_host
+        self.spell_host = CONFIG.spell_host
     def correct(self):
         d = {'Type': 'correction', 'Search': TRUE, 'Query': self.word}
         result = client.send_query(d, self.spell_host)
@@ -101,7 +101,7 @@ class Spell_Query(object):
 class Result_Query(object):
     def __init__(self, word):
         self.word = word
-        self.index_host = config.index_host
+        self.index_host = CONFIG.index_host
     def get_results(self):
         d = {'Partial': False, 'Query': self.word}
         result = client.send_query(d, self.index_host)
