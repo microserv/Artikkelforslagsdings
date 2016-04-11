@@ -1,59 +1,107 @@
+from twisted.internet.defer import DeferredList
 import nltk
 from ast import literal_eval
 import json
 import re
 
-import norvig_spellcheck
-
+import client
 class Query(object):
     def __init__(self, d):
         self.d = d
         self.is_partial = d['Partial']
         self.raw_querystring = d['Query']
+    def process(self):
+        parts = self.tokenize(self.raw_querystring)
+        normalized = self.normalize(parts)
+        spellcheck = self.spellcheck(normalized)
+        def complete_deferreds(dlist, spell_length):            
+            if not self.is_partial:
+                RL_set = set()
+                for elem in dlist[:-spell_length]:
+                    elem_s = elem[1]
+                    d = json.loads(elem_s)
+                    RL_set.update(d['Result'])
+                RL = list(RL_set)
+                    
+            SL = []
+            if spell_length > 0:
+                for elem in dlist[-spell_length:]:
+                    elem_s = elem[1]
+                    mini_list = json.loads(elem_s)
+                    SL.append(mini_list)
+            
+            if self.is_partial:
+                d = {'spell': SL}
+            else:
+                d = {'spell': SL, 'results': RL}
 
-        if self.is_partial:
-            qs = process_partial(self.raw_querystring)
-            self.query = {"Partial": True, "Query": qs}
+            return d
+
+        if not self.is_partial:
+
+            deferreds = [Result_Query(norm).get_results() for norm in normalized]
+            deferreds.extend(spellcheck)
+            
+            dlist = DeferredList(deferreds)
+            dx = dlist.addCallback(lambda x:complete_deferreds(x,spell_length=len(spellcheck)))
+
+            return dx
         else:
-            qs = process_query(self.raw_querystring)
-            self.query = {"Partial": False, "Query": qs}
-
+            deferreds = []
+            deferreds.extend(spellcheck)
+            
+            dlist = DeferredList(deferreds)
+            dx = dlist.addCallback(lambda x:complete_deferreds(x,spell_length=len(spellcheck)))            
+            return dx
+        
     #Encode for index (to dict)
-    def prepare(self):
-        return self.query
+    def tokenize(self, query):
+        #remove additional whitespace, other than trailing ##Kanskje endre?
+        s = re.sub('\s+', ' ', query).lstrip()
+        parts = s.split()
+        return parts
 
-#Process the (partial) query. Mainly process any complete words before the last (incomplete) words.
-#The assumption is that if a query contains multiple words, all the words but the last are "complete",
-#and can be considered a complete query
-def process_partial(s):
-    s2 = s
-    #remove additional whitespace, other than trailing ##Kanskje endre?
-    s2 = re.sub('\s+', ' ', s2).lstrip()
+    def normalize(self, parts):
+        '''normalize by stemming and converting to lowercase'''
+        #stemmer = nltk.stem.snowball.NorwegianStemmer(ignore_stopwords=False)
+        #words = [stemmer.stem(word).lower() for word in parts)]
+
+        #do not actually stem at the moment, maybe later
+        words = [word.lower() for word in parts]
+        return words
+        
+    def spellcheck(self, parts):
+        if self.is_partial:
+            enhanced = [Spell_Query(word).correct() for word in parts[:-1]]
+            if parts[-1] and self.raw_querystring[-1]:
+                enhanced.append(Spell_Query(parts[-1]).complete())
+        else:
+            enhanced = [Spell_Query(word).correct() for word in parts]
+        return enhanced
+        
+       
+TRUE = False
+class Spell_Query(object):
+    def __init__(self, word):
+        self.word = word
+        self.spell_host = "http://127.0.0.1:8002/"
+    def correct(self):
+        d = {'Type': 'correction', 'Search': TRUE, 'Query': self.word}
+        result = client.send_query(d, self.spell_host)
+        return result
+
+    def complete(self):
+        d = {'Type': 'completion', 'Search': TRUE, 'Query': self.word}
+        result = client.send_query(d, self.spell_host)
+        return result
+        
+        
+class Result_Query(object):
+    def __init__(self, word):
+        self.word = word
+        self.index_host = "http://127.0.0.1:8001/"
+    def get_results(self):
+        d = {'Partial': False, 'Query': self.word}
+        result = client.send_query(d, self.index_host)
+        return result
     
-    parts = s2.split(' ')
-    complete = ' '.join(parts[:-1])
-    complete = process_query(complete)
-    
-    partial = parts[-1]
- 
-    s2 = ' '.join([complete, partial])
-    return s2
-#Process the (complete) querystring with normalization/stemming and various enhancements 
-def process_query(s):
-    s2 = s
-    s2 = re.sub('\s+', ' ', s2).lstrip()
-    #s2 = norvig_spellcheck
-    s2 = _normalize_query(s2)
-    s2 = _enhance_query(s2)
-    return s2
-
-#Stemming
-def _normalize_query(s):
-    print(s)
-    stemmer = nltk.stem.snowball.NorwegianStemmer(ignore_stopwords=False)
-    words = [stemmer.stem(word) for word in s.split()]
-    return ' '.join(words)
-
-#Hva?
-def _enhance_query(s):
-    return s
