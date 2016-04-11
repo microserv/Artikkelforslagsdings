@@ -5,6 +5,8 @@ import json
 import re
 
 import client
+import CONFIG
+
 class Query(object):
     def __init__(self, d):
         self.d = d
@@ -84,7 +86,7 @@ TRUE = False
 class Spell_Query(object):
     def __init__(self, word):
         self.word = word
-        self.spell_host = "http://127.0.0.1:8002/"
+        self.spell_host = config.spell_host
     def correct(self):
         d = {'Type': 'correction', 'Search': TRUE, 'Query': self.word}
         result = client.send_query(d, self.spell_host)
@@ -95,11 +97,11 @@ class Spell_Query(object):
         result = client.send_query(d, self.spell_host)
         return result
         
-        
+
 class Result_Query(object):
     def __init__(self, word):
         self.word = word
-        self.index_host = "http://127.0.0.1:8001/"
+        self.index_host = config.index_host
     def get_results(self):
         d = {'Partial': False, 'Query': self.word}
         result = client.send_query(d, self.index_host)
