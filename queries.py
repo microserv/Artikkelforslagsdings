@@ -83,6 +83,7 @@ class Query(object):
         
        
 TRUE = False
+TRUE = True
 class Spell_Query(object):
     def __init__(self, word):
         self.word = word
@@ -103,7 +104,7 @@ class Result_Query(object):
         self.word = word
         self.index_host = CONFIG.index_host
     def get_results(self):
-        d = {'Partial': False, 'Query': self.word}
+        d = {'task': 'GetArticles', 'word': self.word}
         result = client.send_query(d, self.index_host)
         return result
     
