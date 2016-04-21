@@ -1,8 +1,10 @@
 from twisted.internet.defer import DeferredList
+from twisted.internet.defer import Deferred
 import nltk
 from ast import literal_eval
 import json
 import re
+from os import path
 
 import client
 import CONFIG
@@ -12,16 +14,21 @@ class Query(object):
         self.d = d
         self.is_partial = d['Partial']
         self.raw_querystring = d['Query']
+            
     def process(self):
         parts = self.tokenize(self.raw_querystring)
         normalized = self.normalize(parts)
         spellcheck = self.spellcheck(normalized)
-        def complete_deferreds(dlist, spell_length):            
+        def complete_deferreds(dlist, spell_length):
+            print(dlist)
             if not self.is_partial:
                 RL_set = set()
                 for elem in dlist[:-spell_length]:
                     elem_s = elem[1]
+                    print(repr(elem_s))
                     d = json.loads(elem_s)
+                    if type(d) == int:
+                        continue
                     RL_set.update(d['Result'])
                 RL = list(RL_set)
                     
@@ -33,14 +40,14 @@ class Query(object):
                     SL.append(mini_list)
             
             if self.is_partial:
-                d = {'spell': SL}
+                d = {u'spell': SL}
             else:
-                d = {'spell': SL, 'results': RL}
+                d = {u'spell': SL, u'results': RL}
 
             return d
 
         if not self.is_partial:
-
+            
             deferreds = [Result_Query(norm).get_results() for norm in normalized]
             deferreds.extend(spellcheck)
             
@@ -75,15 +82,15 @@ class Query(object):
     def spellcheck(self, parts):
         if self.is_partial:
             enhanced = [Spell_Query(word).correct() for word in parts[:-1]]
-            if parts[-1] and self.raw_querystring[-1]:
+            if parts[-1] and self.raw_querystring[-1] and parts[-1]:
                 enhanced.append(Spell_Query(parts[-1]).complete())
         else:
-            enhanced = [Spell_Query(word).correct() for word in parts]
+            enhanced = [Spell_Query(word).correct() for word in parts ]
         return enhanced
         
        
 TRUE = False
-TRUE = True
+#TRUE = True
 class Spell_Query(object):
     def __init__(self, word):
         self.word = word

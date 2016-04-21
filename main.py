@@ -24,10 +24,10 @@ class SearchServer(resource.Resource):
         #result.addCallback(lambda x:request.write(fx(x)))
         #
         if type(result) == list or type(result) == dict:
-            request.write(json.dumps(result))
+            request.write(json.dumps(result).encode('utf8'))
             request.finish()
         else:
-            result.addCallback(lambda x:request.write(json.dumps(x)))
+            result.addCallback(lambda x:request.write(json.dumps(x).encode('utf8')))
             result.addCallback(lambda x:request.finish())      
         return server.NOT_DONE_YET
         
