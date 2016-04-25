@@ -20,12 +20,10 @@ class Query(object):
         normalized = self.normalize(parts)
         spellcheck = self.spellcheck(normalized)
         def complete_deferreds(dlist, spell_length):
-            print(dlist)
             if not self.is_partial:
                 RL_set = set()
                 for elem in dlist[:-spell_length]:
                     elem_s = elem[1]
-                    print(repr(elem_s))
                     d = json.loads(elem_s)
                     if type(d) == int:
                         continue
