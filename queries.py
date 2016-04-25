@@ -24,6 +24,7 @@ class Query(object):
                 RL_set = set()
                 for elem in dlist[:-spell_length]:
                     elem_s = elem[1]
+                    print(elem_s)
                     d = json.loads(elem_s)
                     if type(d) == int:
                         continue
