@@ -7,6 +7,7 @@ from twisted.internet.protocol import Factory, Protocol
 from twisted.internet.endpoints import TCP4ClientEndpoint
 
 import json
+import CONFIG
 
 import queries
 import client
@@ -36,6 +37,6 @@ class SearchServer(resource.Resource):
         return q.process()
 
 site=server.Site(SearchServer()) 
-reactor.listenTCP(8000,site)
+reactor.listenTCP(CONFIG.SEARCH_SERVER_PORT,site)
 reactor.run()
 
