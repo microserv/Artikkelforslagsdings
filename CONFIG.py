@@ -9,3 +9,8 @@ spell_host = 'http://{}:{}/'.format(comm.get_service_ip('spell', comm_host), 800
 #spell_host = "http://127.0.0.1:8002/"
 
 SEARCH_SERVER_PORT = 8000
+
+try:
+    from local_config import *
+except ImportError:
+    print('Local settings file not found.')
