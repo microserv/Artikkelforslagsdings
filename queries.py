@@ -110,7 +110,7 @@ class Result_Query(object):
         self.word = word
         self.index_host = CONFIG.index_host
     def get_results(self):
-        d = {'task': 'GetArticles', 'word': self.word}
+        d = {'task': 'getArticles', 'word': self.word}
         result = client.send_query(d, self.index_host)
         return result
     
