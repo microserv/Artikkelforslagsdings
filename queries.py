@@ -28,7 +28,11 @@ class Query(object):
                     d = json.loads(elem_s)
                     if type(d) == int:
                         continue
-                    RL_set.update(d['Result'])
+
+                    if d.get("articleID"):
+                        RL_set.update(d["articleID"])
+                    else:
+                        RL_set.update(d['Result'])
                 RL = list(RL_set)
                     
             SL = []
