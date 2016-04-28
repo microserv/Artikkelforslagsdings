@@ -31,8 +31,9 @@ class Query(object):
 
                     if d.get("articleID"):
                         RL_set.update(d["articleID"])
-                    else:
+                    elif d.get("Result"):
                         RL_set.update(d['Result'])
+
                 RL = list(RL_set)
                     
             SL = []
