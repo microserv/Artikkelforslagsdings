@@ -25,7 +25,7 @@ class BeginningPrinter(Protocol):
 
 
 def send_query(query, host_port):
-    """Send a HTTP POST-query to a given host (possibly on a specific port)"""
+        """Send a HTTP POST-query to a given host (possibly on a specific port)"""
         indexquery_string = json.dumps(query)
       
         QUERY = """
