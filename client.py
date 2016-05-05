@@ -9,6 +9,7 @@ from twisted.web.client import Agent, FileBodyProducer
 
 import json
 class BeginningPrinter(Protocol):
+    """Concatenates and returns (as a deferred) a request response"""
     def __init__(self, finished):
         self.finished = finished
         self.remaining = 1024 * 10
@@ -24,6 +25,7 @@ class BeginningPrinter(Protocol):
 
 
 def send_query(query, host_port):
+    """Send a HTTP POST-query to a given host (possibly on a specific port)"""
         indexquery_string = json.dumps(query)
       
         QUERY = """
@@ -41,6 +43,8 @@ Content-Length: {LEN}
             response.deliverBody(BeginningPrinter(finished))
             return finished
         d.addCallback(cbRequest)
+
+        #Returns a deferred for the request response
         return d
 
 
