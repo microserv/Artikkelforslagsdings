@@ -13,7 +13,6 @@ import CONFIG
 import queries
 import client
 
-#Convey searches to index and back
 class SearchServer(resource.Resource):
     """Receives and responds to search queries"""
     isLeaf = True
