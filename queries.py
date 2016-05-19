@@ -28,13 +28,11 @@ class Query(object):
                Input is a deferredlist, where the first (N-spell_length) elements are search results,
                and the last spell_length elements are spellcheck results 
             """
-            
             #Partial searches have no search result, as no search is performed with partial search queries. 
             if not self.is_partial:
                 RL_set = set()
                 for elem in dlist[:-spell_length]:
                     elem_s = elem[1]
-                    print(elem_s)
                     d = json.loads(elem_s)
                     
                     #404 for keyword
