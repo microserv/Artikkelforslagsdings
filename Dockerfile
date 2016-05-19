@@ -18,4 +18,7 @@ RUN pip install -r requirements.txt
 RUN python -m nltk.downloader stopwords
 
 RUN rm -rf /run && mkdir -p /run
+
+ENV SERVICE_NAME search
+
 EXPOSE 80
