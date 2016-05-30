@@ -4,9 +4,9 @@ index_host = None
 spell_host = None
 
 index_service_name = "indexer"
-indexer_port = 8001
+indexer_port = 80
 
 spell_service_name = "spell-check"
-spell_port = 8002
+spell_port = 80
 
 SEARCH_SERVER_PORT = 80
