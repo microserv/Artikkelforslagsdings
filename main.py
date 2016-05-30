@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 #-*- coding:utf8 -*-
+from os import path
 from twisted.web import server, resource
 from twisted.web.http_headers import Headers
 from twisted.internet import reactor
@@ -19,6 +20,13 @@ class SearchServer(resource.Resource):
     def __init__(self):
         pass
     def render_GET(self, request):
+        origin = 'https://despina.128.no'
+        if request.getHeader('Origin') in CONFIG.ALLOWED_ORIGINS:
+            origin = request.getHeader('Origin')
+
+        request.setHeader('Access-Control-Allow-Origin', origin)
+        request.setHeader('Access-Control-Allow-Methods', 'HEAD, GET, POST, PUT, OPTIONS, PATCH, DELETE')
+        request.setHeader('Access-Control-Allow-Headers', 'Content-Type, api_key, Authorization')
         if '/static/swagger.json' in request.uri:
             with open(path.join('static', 'swagger.json')) as f:
                 s = f.read()
@@ -27,19 +35,19 @@ class SearchServer(resource.Resource):
             return NoResource().render(request)
     def render_POST(self, request):
         request_dict = json.load(request.content)
-    
-        result = self.process_query(request_dict)        
+
+        result = self.process_query(request_dict)
         print('Query: {}'.format(request_dict))
         #result.addCallback(lambda x:request.write(fx(x)))
 
-        #Takes care of the case where response is a deferred by 
+        #Takes care of the case where response is a deferred by
         #adding callbacks to write the result when the result is ready.
         if type(result) == list or type(result) == dict:
             request.write(json.dumps(result).encode('utf8'))
             request.finish()
         else:
             result.addCallback(lambda x:request.write(json.dumps(x).encode('utf8')))
-            result.addCallback(lambda x:request.finish())      
+            result.addCallback(lambda x:request.finish())
         return server.NOT_DONE_YET
 
     def process_query(self, request_dict):
@@ -48,7 +56,7 @@ class SearchServer(resource.Resource):
         return q.process()
 
 if __name__ == '__main__':
-    site=server.Site(SearchServer()) 
+    site=server.Site(SearchServer())
     reactor.listenTCP(CONFIG.SEARCH_SERVER_PORT,site)
     reactor.run()
 

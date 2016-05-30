@@ -13,6 +13,11 @@ spell_host = "http://127.0.0.1:8002/"
 
 SEARCH_SERVER_PORT = 8000
 
+ALLOWED_ORIGINS = [
+    'https://gallifrey.sklirg.io',
+    'https://despina.128.no',
+]
+
 try:
     from local_config import *
 except ImportError:
