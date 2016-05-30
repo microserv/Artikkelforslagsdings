@@ -20,7 +20,7 @@ class SearchServer(resource.Resource):
         pass
     def render_POST(self, request):
         request_dict = json.load(request.content)
-
+    
         result = self.process_query(request_dict)        
         print('Query: {}'.format(request_dict))
         #result.addCallback(lambda x:request.write(fx(x)))
@@ -40,8 +40,8 @@ class SearchServer(resource.Resource):
         q = queries.Query(request_dict)
         return q.process()
 
-
-site=server.Site(SearchServer()) 
-reactor.listenTCP(CONFIG.SEARCH_SERVER_PORT,site)
-reactor.run()
+if __name__ == '__main__':
+    site=server.Site(SearchServer()) 
+    reactor.listenTCP(CONFIG.SEARCH_SERVER_PORT,site)
+    reactor.run()
 
