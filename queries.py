@@ -6,6 +6,7 @@ import json
 import re
 from os import path
 
+import comm
 import client
 import CONFIG
 
@@ -135,7 +136,10 @@ class Spell_Query(object):
     """Spelling queries. Completion and correction."""
     def __init__(self, word):
         self.word = word
-        self.spell_host = CONFIG.spell_host
+        if CONFIG.spell_host == None:
+            self.spell_host = 'http://{}:{}/'.format(comm.get_service_ip(CONFIG.spell_service_name, comm_host), CONFIG.spell_port)
+        else:
+            self.spell_host = CONFIG.spell_host
     def correct(self):
         """Query for finding corrections/edit distances to other more likely words"""
         d = {'Type': 'correction', 'Search': USE_SEARCH_FREQ, 'Query': self.word}
@@ -153,7 +157,10 @@ class Result_Query(object):
     """Retrieving results (articles) for a given keyword"""
     def __init__(self, word):
         self.word = word
-        self.index_host = CONFIG.index_host
+        if CONFIG.index_host == None:
+            self.index_host = 'http://{}:{}/'.format(comm.get_service_ip(CONFIG.index_service_name, comm_host), CONFIG.indexer_port)
+        else:
+            self.index_host = CONFIG.index_host
     def get_results(self):
         d = {'task': 'getArticles', 'word': self.word}
         result = client.send_query(d, self.index_host)
