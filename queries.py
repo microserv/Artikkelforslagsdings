@@ -135,7 +135,7 @@ class Spell_Query(object):
     def __init__(self, word):
         self.word = word
         if CONFIG.spell_host == None:
-            self.spell_host = 'http://{}:{}/'.format(comm.get_service_ip(CONFIG.spell_service_name, comm_host), CONFIG.spell_port)
+            self.spell_host = 'http://{}:{}/'.format(comm.get_service_ip(CONFIG.spell_service_name, CONFIG.comm_host), CONFIG.spell_port)
         else:
             self.spell_host = CONFIG.spell_host
     def correct(self):
@@ -156,7 +156,7 @@ class Result_Query(object):
     def __init__(self, word):
         self.word = word
         if CONFIG.index_host == None:
-            self.index_host = 'http://{}:{}/'.format(comm.get_service_ip(CONFIG.index_service_name, comm_host), CONFIG.indexer_port)
+            self.index_host = 'http://{}:{}/'.format(comm.get_service_ip(CONFIG.index_service_name, CONFIG.comm_host), CONFIG.indexer_port)
         else:
             self.index_host = CONFIG.index_host
     def get_results(self):
