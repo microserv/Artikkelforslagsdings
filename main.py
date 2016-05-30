@@ -19,7 +19,7 @@ class SearchServer(resource.Resource):
     def __init__(self):
         pass
     def render_GET(self, request):
-        if request.uri == '/static/swagger.json':
+        if '/static/swagger.json' in request.uri:
             with open(path.join('static', 'swagger.json')) as f:
                 s = f.read()
             return s

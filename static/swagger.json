@@ -1,1 +1,84 @@
-{'a':1}
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Search",
+        "description": "Search Microservice",
+        "version": "1.0.0"
+    },
+    "host": "despina.128.no",
+    "schemes": [
+        "http"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/search": {
+            "post": {
+                "summary": "Search for keywords in articles",
+                "description": "Specify whether the search query is partial or complete. \nPartial queries return a list of spelling correction suggestions\nfor each query word, where the last element is a list of suggested completions\n(of the last query word).\n\nComplete queries return a list of spelling correction suggestions \nfor each query word, as well as a list of search results.\n",
+                "parameters": [
+                    {
+                        "name": "Partial",
+                        "in": "formData",
+                        "description": "Whether or not the query is a partial search query.",
+                        "required": true,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "Query",
+                        "in": "formData",
+                        "description": "A search query, possibly several words, separated by spaces.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Spelling feedback and potentially results (if complete search).",
+                        "schema": {
+                            "$ref": "#/definitions/Search"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Search": {
+            "type": "object",
+            "properties": {
+                "spell": {
+                    "type": "array",
+                    "description": "List with lists of spelling suggestions, one for each word in query. The last list is a list of completions if the Partial argument is true.",
+                    "items": {
+                        "$ref": "#/definitions/Search_Spell"
+                    }
+                },
+                "result": {
+                    "type": "array",
+                    "description": "A list of article IDs",
+                    "items": {
+                        "$ref": "#/definitions/Search_Results"
+                    }
+                }
+            }
+        },
+        "Search_Spell": {
+            "type": "array",
+            "description": "List of spelling/autocompletion suggestions",
+            "items": {
+                "type": "string",
+                "description": "suggestion"
+            }
+        },
+        "Search_Results": {
+            "type": "array",
+            "description": "List of article suggestions",
+            "items": {
+                "type": "string",
+                "description": "result id"
+            }
+        }
+    }
+}
